@@ -1,8 +1,18 @@
-import { Code_To_Tokens_Converter } from "./Code_To_Tokens_Converter.js";
-import { Token_Handler_Functions_To_Inject_Into_Tokenizer } from "./Token_Handler_Functions_To_Inject_Into_Tokenizer.js";
+import fs from "node:fs";
+import { Comment_Remover } from "./Comment_Remover.js";
+import { Config } from "./Config.js";
+import { Tokens_Saver } from "./Tokens_Saver.js";
+import { Tokenizer } from "./Tokenizer.js";
+
+// determines which newline type to use  \r\n (windows) or \n (linux)
+Config.set_new_line_type("windows"); 
 
 const provided_path_from_command_line_argument = process.argv[2];
+const pathToFileWithoutComments = Comment_Remover.get_code_without_comments_from_file_at_path_and_save_to_a_new_file_in_the_same_directory(provided_path_from_command_line_argument);
 
-const tokenHandler = new Token_Handler_Functions_To_Inject_Into_Tokenizer(); 
-const tokenizer = new Code_To_Tokens_Converter(provided_path_from_command_line_argument);
-tokenHandler.injectInto(tokenizer);
+const codeWithoutComments = fs.readFileSync(pathToFileWithoutComments, "utf8");
+const tokens = Tokenizer.tokenize(codeWithoutComments);
+Tokens_Saver.save_tokens_in_the_same_directory_as_path(tokens, pathToFileWithoutComments);
+console.log("done?");
+
+
