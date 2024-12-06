@@ -80,10 +80,14 @@ class Tokenizer {
 
         let integerValue = '';
         let localCharIndex = this.currentCharIndex;
-        let there_are_numbers_left_to_process = Boolean(Number.isInteger(this.code[localCharIndex]));
+        let currentCharacter = this.code[localCharIndex];
+        let currentNumber = parseInt(currentCharacter);
+        let there_are_numbers_left_to_process = 
+        Boolean(!isNaN(currentNumber));
+        
         while (there_are_numbers_left_to_process) {
-            integerValue += this.code[localCharIndex];
-
+            integerValue = `${integerValue}${this.code[localCharIndex]}`;
+            
             const nextCharacter = this.code[localCharIndex + 1];
             there_are_numbers_left_to_process = Boolean(Number.isInteger(nextCharacter));
             if (there_are_numbers_left_to_process) {
@@ -96,6 +100,7 @@ class Tokenizer {
                 value: integerValue,
                 lastCharacterIndex: localCharIndex
             };
+            
         }
         return token;
 
@@ -171,12 +176,12 @@ class Tokenizer {
     static orAStringConstant() {
         let token = false;
         let firstCharacter = this.code[this.currentCharIndex];
-        // important to move to next char before the while loop below, otherwise it will try checking if " === " and exit immediately
-        this.currentCharIndex++;
         const isAStringConstant = Boolean(firstCharacter === `"`);
         if (!isAStringConstant) {
             return token;
         }
+         // important to move to next char after knowing a string begun AND before the while loop below, otherwise it will try checking if " === " and exit immediately
+        this.currentCharIndex++;
 
         let stringConstantValue = ``;
 
