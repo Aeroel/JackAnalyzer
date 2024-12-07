@@ -1,5 +1,5 @@
-export { Tokenizer };
-class Tokenizer {
+export { Code_To_Tokens_Converter };
+class Code_To_Tokens_Converter {
     static symbols = [
         "{", "}",
         "(", ")",
@@ -29,12 +29,12 @@ class Tokenizer {
     static there_are_characters_left_to_process = false;
     static code = '';
 
-    static tokenize(code) {
+    static convert_code_to_tokens(code) {
         this.code = code;
         this.currentCharIndex = 0;
         this.there_are_characters_left_to_process = Boolean(this.currentCharIndex < code.length);
         while (this.there_are_characters_left_to_process) {
-            const possible_token_that_starts_at_current_char_index = this.get_token_that_start_from_current_character_index_if_any();
+            const possible_token_that_starts_at_current_char_index = this.get_token_that_starts_from_current_character_index_if_any();
 
             const aTokenStartingAtCurrentCharFound = Boolean(possible_token_that_starts_at_current_char_index);
             if (!aTokenStartingAtCurrentCharFound) {
@@ -49,7 +49,7 @@ class Tokenizer {
         }
         return this.tokens;
     }
-    static get_token_that_start_from_current_character_index_if_any() {
+    static get_token_that_starts_from_current_character_index_if_any() {
         const valueIfNoTokenFound = false;
         const tokenIfAny = this.mightBeASymbol()
             || this.orAnIntegerConstant()
@@ -82,25 +82,26 @@ class Tokenizer {
         let localCharIndex = this.currentCharIndex;
         let currentCharacter = this.code[localCharIndex];
         let currentNumber = parseInt(currentCharacter);
-        let there_are_numbers_left_to_process = 
-        Boolean(!isNaN(currentNumber));
-        
+        let there_are_numbers_left_to_process =
+            Boolean(!isNaN(currentNumber));
+
         while (there_are_numbers_left_to_process) {
             integerValue = `${integerValue}${this.code[localCharIndex]}`;
-            
+
             const nextCharacter = this.code[localCharIndex + 1];
             there_are_numbers_left_to_process = Boolean(Number.isInteger(nextCharacter));
             if (there_are_numbers_left_to_process) {
                 localCharIndex++;
             }
         }
-        if (integerValue.length > 0) {
+        const isIntegerConstant = Boolean(integerValue.length > 0);
+        if (isIntegerConstant) {
             token = {
                 type: "integerConstant",
                 value: integerValue,
                 lastCharacterIndex: localCharIndex
             };
-            
+
         }
         return token;
 
@@ -133,7 +134,8 @@ class Tokenizer {
             currentCharacter = this.code[localCharIndex];
 
         }
-        if (this.keywords.includes(keywordValue)) {
+        const isAKeyword = Boolean(this.keywords.includes(keywordValue));
+        if (isAKeyword) {
             token = {
                 type: "keyword",
                 value: keywordValue,
@@ -162,8 +164,15 @@ class Tokenizer {
             localCharIndex++;
             currentCharacter = this.code[localCharIndex];
         }
-
-        if (identifierValue.length > 0) {
+        /*
+        // about the keyword check here:
+        // I include it to make the calling order in the checking chain in this.get_token_that_starts_from_current_character_index_if_any() (I mean the function above where I do this() || orThat() || orMaybeThis(), etc) irrelevant.
+        More details:
+        If we don't check for if this identifier is actually a keyword and then call the identifier check before the keyword check, we will end up treating the keyword as an identifier (versus if we call keyword check before this identifier check, which would determine it is really a keyword and then thus not call identifier check at all). Adding this check here makes it irrelevant whether we first call keyword check or identifier check in get_token_that_starts_from_current_character_index_if_any
+        */
+        const isAKeyword = Boolean(this.keywords.includes(identifierValue));
+        const isIdentifier = Boolean(identifierValue.length > 0 && !isAKeyword);
+        if (isIdentifier) {
             token = {
                 type: "identifier",
                 value: identifierValue,
@@ -176,11 +185,12 @@ class Tokenizer {
     static orAStringConstant() {
         let token = false;
         let firstCharacter = this.code[this.currentCharIndex];
-        const isAStringConstant = Boolean(firstCharacter === `"`);
-        if (!isAStringConstant) {
+        const aStringConstantBegins = Boolean(firstCharacter === `"`);
+        if (!aStringConstantBegins) {
             return token;
         }
-         // important to move to next char after knowing a string begun AND before the while loop below, otherwise it will try checking if " === " and exit immediately
+        // important to move to next char after knowing a string begun AND before the while loop below, otherwise it will try checking if " === " and exit immediately even if the string is not empty.
+        // so we advance the current character to the beginning of the actual string
         this.currentCharIndex++;
 
         let stringConstantValue = ``;
@@ -194,14 +204,14 @@ class Tokenizer {
             currentCharacter = this.code[localCharIndex];
         }
 
-        if (stringConstantValue.length > 0) {
-            token = {
-                type: "stringConstant",
-                value: stringConstantValue,
-                lastCharacterIndex: localCharIndex,
-            };
+        // if we reach this line, this necessarily means we have a quote, whether empty or length > 0.
+        // i.e., we encountered a quote, entered the  while loop and exited it after encountering the second closing quote and reached this line, this means we have a string, though it might well be empty
+        token = {
+            type: "stringConstant",
+            value: stringConstantValue,
+            lastCharacterIndex: localCharIndex,
+        };
 
-        }
         return token;
     }
 

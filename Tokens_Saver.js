@@ -12,9 +12,10 @@ class Tokens_Saver {
         let xml = '';
         tokens.forEach(token => {
             const openingTag = `<${token.type}>`;
+
             let value = token.value;
-            value = value.replaceAll("<", "&lt;");
-            value = value.replaceAll(">", "&gt;");
+            value = this.escape_special_xml_characters(value);
+
             const closingTag = `</${token.type}>`;
             const fullTokenXMLForm = `${openingTag} ${value} ${closingTag}${Helper_Functions.getNewline()}`;
             xml += fullTokenXMLForm;
@@ -24,6 +25,16 @@ class Tokens_Saver {
         xml = `${tokensOpeningTag}${xml}${tokensClosingTag}`;
         return xml;
     }
+    static escape_special_xml_characters(value) {
+        // make sure you replace & at the beginning, otherwise you will replace the escaped forms of > < and " too which would make no sense 
+        value = value.replaceAll("&", "&amp;");
+
+        value = value.replaceAll("<", "&lt;");
+        value = value.replaceAll(">", "&gt;");
+        value = value.replaceAll(`"`, "&quot;");
+        return value;
+    }
+
     static save_tokens_in_the_same_directory_as_path(tokens, path) {
         const tokensXML = this.convertTokensToXML(tokens);
         

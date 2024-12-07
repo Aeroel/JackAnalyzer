@@ -1,12 +1,30 @@
-function character_is_number_or_underscore_or_ascii_english_letter(character) {
-    const code = character.charCodeAt(0); // Get the Unicode value of the character
+class A {
+    funchehe() {
+        if (this.somethingBad()) {
+            this.generic_error();
+        }
+    }
 
-    // Check if the character is a letter (A-Z or a-z), a digit (0-9), or an underscore (_)
-    return (
-        (code >= 65 && code <= 90) || // A-Z
-        (code >= 97 && code <= 122) || // a-z
-        (code >= 48 && code <= 57) ||  // 0-9
-        code === 95                     // _
-    );
+    generic_error() {
+        const stack = new Error().stack.split('\n');
+        // The caller function is usually on the third line of the stack trace
+        const callerLine = stack[2]; 
+        const callerNameMatch = callerLine.match(/at (\w+\.\w+|\w+|\<anonymous\>)/); // Match function names
+        
+        // If a match is found, use it; otherwise, default to 'Unknown'
+        const callerName = callerNameMatch ? callerNameMatch[1] : 'Unknown';
+        
+        throw new Error(`Error called from: ${callerName}`);
+    }
+
+    somethingBad() {
+        return true; // Simulating a bad condition
+    }
 }
-console.log(character_is_number_or_underscore_or_ascii_english_letter(`/`));
+
+const instance = new A();
+try {
+    instance.funchehe();
+} catch (error) {
+    console.log(error.message); // Should log: Error called from: funchehe
+}
