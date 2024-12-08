@@ -9,16 +9,24 @@ class Convenient_Way_To_Advance_Through_Tokens {
         this.tokens = tokens;
         this.currentIndex = 0;
         this.currentToken = this.tokens[this.currentIndex];
+        this.nextToken = this.tokens[this.currentIndex + 1];
     }
     advance() {
         this.currentIndex++;
         this.currentToken = this.tokens[this.currentIndex];
+        this.nextToken = this.tokens[this.currentIndex + 1];
     }
     tokenType() {
         return this.currentToken.type;
     }
     tokenValue() {
         return this.currentToken.value;
+    }
+    nextTokenType() {
+        return this.nextToken.type;
+    }
+    nextTokenValue() {
+        return this.nextToken.value;
     }
     triggerGenericTypeMismatchErrorIfNeeded(expected, got) {
         if (expected === got) {
