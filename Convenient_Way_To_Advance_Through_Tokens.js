@@ -1,3 +1,5 @@
+export {Convenient_Way_To_Advance_Through_Tokens}
+
 class Convenient_Way_To_Advance_Through_Tokens {
     tokens;
     currentIndex;
@@ -10,11 +12,13 @@ class Convenient_Way_To_Advance_Through_Tokens {
         this.currentIndex = 0;
         this.currentToken = this.tokens[this.currentIndex];
         this.nextToken = this.tokens[this.currentIndex + 1];
+        this.previousToken = this.tokens[this.currentIndex - 1];
     }
     advance() {
         this.currentIndex++;
         this.currentToken = this.tokens[this.currentIndex];
         this.nextToken = this.tokens[this.currentIndex + 1];
+        this.previousToken = this.tokens[this.currentIndex - 1];
     }
     tokenType() {
         return this.currentToken.type;
@@ -28,30 +32,37 @@ class Convenient_Way_To_Advance_Through_Tokens {
     nextTokenValue() {
         return this.nextToken.value;
     }
+    previousTokenValue() {
+        return this.previousToken.value;
+    }
+    previousTokenType() {
+        return this.previousToken.type;
+    }
     triggerGenericTypeMismatchErrorIfNeeded(expected, got) {
         if (expected === got) {
             return;
         }
-        throw new Error(`[Convenient_Way_To_Advance_Through_Tokens] mismatcho of types. Getting token  of type ${expected}'s value: expected type ${expected}, got ${got}`);
+        const val = this.tokenValue();
+        throw new Error(`[Convenient_Way_To_Advance_Through_Tokens] mismatch of types. Getting token  of type ${expected}'s value: expected type ${expected}, got ${got} with value ${val}. Next token value: ${this.nextTokenValue()}, previous token value: ${this.previousTokenValue()}`);
     }
     keywordValue() {
         this.triggerGenericTypeMismatchErrorIfNeeded("keyword", this.tokenType());
-        return this.tokenValue;
+        return this.tokenValue();
     }
     symbolValue() {
         this.triggerGenericTypeMismatchErrorIfNeeded("symbol", this.tokenType());
-        return this.tokenValue;
+        return this.tokenValue();
     }
     identifierValue() {
         this.triggerGenericTypeMismatchErrorIfNeeded("identifier", this.tokenType());
-        return this.tokenValue;
+        return this.tokenValue();
     }
     integerValue() {
         this.triggerGenericTypeMismatchErrorIfNeeded("integerConstant", this.tokenType());
-        return this.tokenValue;
+        return this.tokenValue();
     }
     stringValue() {
         this.triggerGenericTypeMismatchErrorIfNeeded("stringConstant", this.tokenType());
-        return this.tokenValue;
+        return this.tokenValue();
     }
 }
