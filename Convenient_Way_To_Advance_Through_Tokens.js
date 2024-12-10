@@ -43,7 +43,7 @@ class Convenient_Way_To_Advance_Through_Tokens {
             return;
         }
         const val = this.tokenValue();
-        throw new Error(`[Convenient_Way_To_Advance_Through_Tokens] mismatch of types. Getting token  of type ${expected}'s value: expected type ${expected}, got ${got} with value ${val}. Next token value: ${this.nextTokenValue()}, previous token value: ${this.previousTokenValue()}`);
+        throw new Error(`[Convenient_Way_To_Advance_Through_Tokens] mismatch of types. Getting token  of type ${expected}'s value: expected type ${expected}, got ${got} with value "${val}". Next token value: "${this.nextTokenValue()}", previous token value: "${this.previousTokenValue()}"`);
     }
     keywordValue() {
         this.triggerGenericTypeMismatchErrorIfNeeded("keyword", this.tokenType());

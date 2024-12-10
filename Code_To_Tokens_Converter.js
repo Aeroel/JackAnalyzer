@@ -89,7 +89,7 @@ class Code_To_Tokens_Converter {
             integerValue = `${integerValue}${this.code[localCharIndex]}`;
 
             const nextCharacter = this.code[localCharIndex + 1];
-            there_are_numbers_left_to_process = Boolean(Number.isInteger(nextCharacter));
+            there_are_numbers_left_to_process = Boolean(!isNaN(parseInt(nextCharacter)));
             if (there_are_numbers_left_to_process) {
                 localCharIndex++;
             }

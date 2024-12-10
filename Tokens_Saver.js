@@ -13,8 +13,8 @@ class Tokens_Saver {
         tokens.forEach(token => {
             const openingTag = `<${token.type}>`;
 
+            token.value = this.escape_special_xml_characters(token.value);
             let value = token.value;
-            value = this.escape_special_xml_characters(value);
 
             const closingTag = `</${token.type}>`;
             const fullTokenXMLForm = `${openingTag} ${value} ${closingTag}${Helper_Functions.getNewline()}`;

@@ -1,8 +1,10 @@
 export { Tokens_To_Tree_Converter };
 import fs from 'node:fs';
 import { Convenient_Way_To_Advance_Through_Tokens } from './Convenient_Way_To_Advance_Through_Tokens.js';
-import formatXml from 'xml-formatter';
+//import formatXml from 'xml-formatter';
 import { Helper_Functions } from './Helper_Functions.js';
+import { Code_To_Tokens_Converter } from './Code_To_Tokens_Converter.js';
+import { Tokens_Saver } from './Tokens_Saver.js';
 
 class Tokens_To_Tree_Converter {
 
@@ -12,7 +14,7 @@ class Tokens_To_Tree_Converter {
     static save_tree_XML_in_same_dir_as_path(filePath) {
         const xmlFilePath = filePath + ".tree.xml";
         console.log(`[Tokens To Tree XML] Saving XML into new file at ${xmlFilePath}`);
-        const xml = formatXml(this.xml, { collapseContent: true, indentation: '  ', throwOnFailure: false });
+        const xml = this.xml//formatXml(this.xml, { collapseContent: true, indentation: '  ', throwOnFailure: false });
         fs.writeFileSync(xmlFilePath, xml);
     }
 
@@ -116,7 +118,7 @@ class Tokens_To_Tree_Converter {
         this.compile_param_name();
     }
     static compile_param_type() {
-        this.compile_identifier();
+            this.consume(this.tokenizer.tokenValue());
     }
     static compile_param_name() {
         this.compile_identifier();
@@ -140,7 +142,9 @@ class Tokens_To_Tree_Converter {
         this.appendToXML(`</subroutineBody>`);
     }
     static compile_statements() {
-        Tokens_To_Tree_Converter.xml += `<statements>`;
+        const withoutThisNewlineComparisonFails = Helper_Functions.getNewline();
+        Tokens_To_Tree_Converter.appendToXML(`<statements>
+        ${withoutThisNewlineComparisonFails}`);
         const possibleStatements = ["let", "if", "while", "do", "return"];
         let isAStatement;
         let statements_left_to_process;
@@ -236,15 +240,22 @@ class Tokens_To_Tree_Converter {
         Tokens_To_Tree_Converter.xml += str;
     }
     static compile_expression() {
-        this.appendToXML(`<expression>`);
+        this.appendToXML(`<expression>
+            `);
         this.compile_term();
         this.compile_additional_zero_or_more_occurrences_of_op_term();
         this.appendToXML(`</expression>`);
     }
     static compile_additional_zero_or_more_occurrences_of_op_term() {
-        const operators = [
+        let operators = [
             "+", "-", "*", "/", "&", "|", "<", ">", "="
         ];
+        operators = operators.map((op) => {
+            return Tokens_Saver.escape_special_xml_characters(op);
+        })
+        console.log(operators);
+        
+
         let anyMoreLeft = Boolean(operators.includes(Tokens_To_Tree_Converter.tokenizer.tokenValue()));
         while (anyMoreLeft) {
             Tokens_To_Tree_Converter.consume_operator();
@@ -322,15 +333,19 @@ class Tokens_To_Tree_Converter {
 
         const nextTokenValue = this.tokenizer.nextTokenValue();
 
-        isVarNameWithArrayAccess = Boolean(nextTokenValue === '[');
+        isVarNameWithArrayAccess = Boolean(this.tokenizer.tokenType() === 'identifier' && nextTokenValue === '[');
 
-        isSubroutineCall = Boolean(nextTokenValue === '.' || nextTokenValue === '(');
+        const tokenValueIsUnaryOp = Boolean(["~", "-"].includes(this.tokenizer.tokenValue()));
+        isUnaryOp = Boolean(tokenValueIsUnaryOp);
+
+        isSubroutineCall = Boolean(
+            !isUnaryOp && this.tokenizer.tokenType() === 'identifier' &&
+            (nextTokenValue === '.' || nextTokenValue === '(')
+        );
 
         isExpression = Boolean(this.tokenizer.tokenValue() === '(');
 
-        const tokenValueIsUnaryOp = Boolean(["~", "-"].includes(this.tokenizer.tokenValue()));
 
-        isUnaryOp = Boolean(tokenValueIsUnaryOp);
 
         isJustVarName = Boolean(!(isVarNameWithArrayAccess || isObjMethodOrStaticFuncCall || isSubroutineCall || isExpression || isUnaryOp));
 
@@ -440,8 +455,8 @@ class Tokens_To_Tree_Converter {
         Tokens_To_Tree_Converter.compile_expression();
         let anyMoreExpressionsLeftToProcess = Boolean(Tokens_To_Tree_Converter.tokenizer.tokenValue() === ',');
         while (anyMoreExpressionsLeftToProcess) {
+            this.consume(',');
             Tokens_To_Tree_Converter.compile_expression();
-
             anyMoreExpressionsLeftToProcess = Boolean(Tokens_To_Tree_Converter.tokenizer.tokenValue() === ',');
         }
         this.appendToXML(`</expressionList>`);
