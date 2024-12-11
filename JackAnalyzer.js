@@ -5,8 +5,6 @@ import { Tokens_Saver } from "./Tokens_Saver.js";
 import { Code_To_Tokens_Converter } from "./Code_To_Tokens_Converter.js";
 import { Tokens_To_Tree_Converter } from "./Tokens_To_Tree_Converter.js";
 
-// determines which newline type to use  \r\n (windows) or \n (linux)
-Config.set_new_line_type("windows"); 
 
 const provided_path_from_command_line_argument = process.argv[2];
 const pathToFileWithoutComments = Comment_Remover.get_code_without_comments_from_file_at_path_and_save_to_a_new_file_in_the_same_directory(provided_path_from_command_line_argument);

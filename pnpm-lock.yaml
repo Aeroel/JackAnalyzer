@@ -6,42 +6,4 @@ settings:
 
 importers:
 
-  .:
-    dependencies:
-      fast-xml-parser:
-        specifier: ^4.5.0
-        version: 4.5.0
-      xml-formatter:
-        specifier: ^3.6.3
-        version: 3.6.3
-
-packages:
-
-  fast-xml-parser@4.5.0:
-    resolution: {integrity: sha512-/PlTQCI96+fZMAOLMZK4CWG1ItCbfZ/0jx7UIJFChPNrx7tcEgerUgWbeieCM9MfHInUDyK8DWYZ+YrywDJuTg==}
-    hasBin: true
-
-  strnum@1.0.5:
-    resolution: {integrity: sha512-J8bbNyKKXl5qYcR36TIO8W3mVGVHrmmxsd5PAItGkmyzwJvybiw2IVq5nqd0i4LSNSkB/sx9VHllbfFdr9k1JA==}
-
-  xml-formatter@3.6.3:
-    resolution: {integrity: sha512-++x1TlRO1FRlQ82AZ4WnoCSufaI/PT/sycn4K8nRl4gnrNC1uYY2VV/67aALZ2m0Q4Q/BLj/L69K360Itw9NNg==}
-    engines: {node: '>= 16'}
-
-  xml-parser-xo@4.1.2:
-    resolution: {integrity: sha512-Z/DRB0ZAKj5vAQg++XsfQQKfT73Vfj5n5lKIVXobBDQEva6NHWUTxOA6OohJmEcpoy8AEqBmSGkXXAnFwt5qAA==}
-    engines: {node: '>= 16'}
-
-snapshots:
-
-  fast-xml-parser@4.5.0:
-    dependencies:
-      strnum: 1.0.5
-
-  strnum@1.0.5: {}
-
-  xml-formatter@3.6.3:
-    dependencies:
-      xml-parser-xo: 4.1.2
-
-  xml-parser-xo@4.1.2: {}
+  .: {}

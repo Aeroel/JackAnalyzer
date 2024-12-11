@@ -46,16 +46,18 @@ async function processFolder(folderPath) {
             const jackFile = join(folderPath, file);
             const baseName = basename(file, '.jack');
             const xmlFile = join(folderPath, `${baseName}.xml`);
-            const tokensFile = join(folderPath, `${baseName}.jack.comments_removed.tokens`);
+            const tokensFile = join(folderPath, `${baseName}.jack.comments_removed.tokens.xml`);
             const tXmlFile = join(folderPath, `${baseName}T.xml`);
 
             try {
                 await runJackAnalyzer(jackFile);
-                const result1 = await runTextComparer(tXmlFile, tokensFile);
-                const result2 = await runTextComparer(xmlFile, join(folderPath, `${baseName}.jack.tree.xml`));
-                console.log({result1, result2});
+                const tokenizerResult = await runTextComparer(tXmlFile, tokensFile);
+                const parserResult = await runTextComparer(xmlFile, join(folderPath, `${baseName}.jack.tree.xml`));
+                console.log({result1: tokenizerResult, result2: parserResult});
                 
-                if (result2.includes('success') && result2.includes('Comparison')) {
+                const tokenizerPassed = tokenizerResult.includes('success') && tokenizerResult.includes('Comparison');
+                const parserPassed = parserResult.includes('success') && parserResult.includes('Comparison');
+                if (tokenizerPassed && parserPassed) {
                     successTests++;
                 }
             } catch (error) {
