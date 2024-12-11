@@ -17,7 +17,9 @@ class Tokens_To_Tree_Converter {
         const xml = this.xml//formatXml(this.xml, { collapseContent: true, indentation: '  ', throwOnFailure: false });
         fs.writeFileSync(xmlFilePath, xml);
     }
-
+    static appendToXML(str) {
+        Tokens_To_Tree_Converter.xml += `${str}` + Helper_Functions.getNewline("linux");
+    }
     static parse_tokens_into_tree_XML(tokens) {
         console.log(`[Tokens To Tree XML] Converting tokens array of length ${tokens.length} into tree XML `);
 
@@ -83,7 +85,7 @@ class Tokens_To_Tree_Converter {
 
     }
     static compile_class_subroutine_dec() {
-        Tokens_To_Tree_Converter.xml += `<subroutineDec>`;
+        this.appendToXML(`<subroutineDec>`);
         Tokens_To_Tree_Converter.consume_constructor_or_function_or_method();
         Tokens_To_Tree_Converter.compile_subroutine_return_type();
         Tokens_To_Tree_Converter.compile_subroutine_name();
@@ -92,14 +94,13 @@ class Tokens_To_Tree_Converter {
         Tokens_To_Tree_Converter.consume(')');
         Tokens_To_Tree_Converter.compile_subroutine_body();
 
-        Tokens_To_Tree_Converter.xml += `</subroutineDec>`;
+        this.appendToXML(`</subroutineDec>`);
     }
     static compile_subroutine_name() {
         this.compile_identifier();
     }
     static compile_parameter_list() {
-        this.appendToXML(`<parameterList>
-            `);
+        this.appendToXML(`<parameterList>`);
         this.parameters_are_optional();
         this.appendToXML(`</parameterList>`);
     }
@@ -142,9 +143,7 @@ class Tokens_To_Tree_Converter {
         this.appendToXML(`</subroutineBody>`);
     }
     static compile_statements() {
-        const withoutThisNewlineComparisonFails = Helper_Functions.getNewline();
-        Tokens_To_Tree_Converter.appendToXML(`<statements>
-        ${withoutThisNewlineComparisonFails}`);
+        Tokens_To_Tree_Converter.appendToXML(`<statements>`);
         const possibleStatements = ["let", "if", "while", "do", "return"];
         let isAStatement;
         let statements_left_to_process;
@@ -157,7 +156,7 @@ class Tokens_To_Tree_Converter {
             Tokens_To_Tree_Converter.compile_statement();
             prepare_for_next_iteration();
         }
-        Tokens_To_Tree_Converter.xml += `</statements>`;
+        this.appendToXML(`</statements>`);
 
     }
     static compile_statement() {
@@ -236,12 +235,9 @@ class Tokens_To_Tree_Converter {
         }
         this.compile_expression();
     }
-    static appendToXML(str) {
-        Tokens_To_Tree_Converter.xml += str;
-    }
+
     static compile_expression() {
-        this.appendToXML(`<expression>
-            `);
+        this.appendToXML(`<expression>`);
         this.compile_term();
         this.compile_additional_zero_or_more_occurrences_of_op_term();
         this.appendToXML(`</expression>`);
@@ -440,12 +436,7 @@ class Tokens_To_Tree_Converter {
         this.consume(this.tokenizer.tokenValue());
     }
     static compile_expression_list() {
-        // in the nand text comparer if I don't add this new line it fails... lol?? Why?
-        // is it an oversight or something since whitespace presumably makes no difference? 
-        const withoutThisNewlineComparisonFailsHm = Helper_Functions.getNewline();
-        this.appendToXML(`<expressionList>`
-            + withoutThisNewlineComparisonFailsHm
-        );
+        this.appendToXML(`<expressionList>` );
         const endOfExpressionListMarker = ')';
         let moreThanZeroExpressions = Boolean(Tokens_To_Tree_Converter.tokenizer.tokenValue() !== endOfExpressionListMarker);
         if (!moreThanZeroExpressions) {
@@ -473,7 +464,7 @@ class Tokens_To_Tree_Converter {
     }
     static compile_token_type_and_value() {
         const varTypeXML = `<${Tokens_To_Tree_Converter.tokenizer.tokenType()}> ${Tokens_To_Tree_Converter.tokenizer.tokenValue()} </${Tokens_To_Tree_Converter.tokenizer.tokenType()}>`;
-        Tokens_To_Tree_Converter.xml += varTypeXML;
+        this.appendToXML(varTypeXML);
         Tokens_To_Tree_Converter.tokenizer.advance();
     }
     static compile_zero_or_more_var_decs() {
@@ -548,7 +539,7 @@ class Tokens_To_Tree_Converter {
 
     static compile_identifier() {
 
-        Tokens_To_Tree_Converter.xml += `<identifier> ${Tokens_To_Tree_Converter.tokenizer.identifierValue()} </identifier>`;
+        this.appendToXML(`<identifier> ${Tokens_To_Tree_Converter.tokenizer.identifierValue()} </identifier>`);
 
         Tokens_To_Tree_Converter.tokenizer.advance();
 

@@ -55,10 +55,7 @@ async function processFolder(folderPath) {
                 const result2 = await runTextComparer(xmlFile, join(folderPath, `${baseName}.jack.tree.xml`));
                 console.log({result1, result2});
                 
-                if (result1.includes('success') && result1.includes('comparison')) {
-                    successTests++;
-                }
-                if (result2.includes('success') && result2.includes('comparison')) {
+                if (result2.includes('success') && result2.includes('Comparison')) {
                     successTests++;
                 }
             } catch (error) {
